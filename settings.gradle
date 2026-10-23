@@ -1,1 +1,11 @@
 rootProject.name = 'ServiceHub'
+
+//rootProject.name = 'ServiceHubBackend'
+
+include 'user-service'
+
+include 'auth-service'
+
+include 'api-gateway'
+
+include 'discovery-server' //Eureka Server

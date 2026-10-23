@@ -1,0 +1,34 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.3'
+}
+
+group = 'com.servicehub'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+ext {
+    set('springCloudVersion', "2023.0.0")
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Modern Version Managers
+    implementation platform("org.springframework.boot:spring-boot-dependencies:3.2.3")
+    implementation platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
+
+    // Main dependencies
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+// DHYAN DEIN: Yahan niche se purana dependencyManagement block hata diya gaya hai!
