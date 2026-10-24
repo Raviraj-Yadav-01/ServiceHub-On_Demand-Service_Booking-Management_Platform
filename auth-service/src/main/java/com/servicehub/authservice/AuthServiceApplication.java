@@ -12,8 +12,10 @@ public class AuthServiceApplication {
 
     public static void main(String[] args) {
 
-        Dotenv dotenv = Dotenv.configure().directory("./auth-service").load();
-        dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
+        Dotenv.configure()
+                .ignoreIfMissing()
+                .systemProperties()
+                .load();
 
         SpringApplication.run(AuthServiceApplication.class, args);
     }

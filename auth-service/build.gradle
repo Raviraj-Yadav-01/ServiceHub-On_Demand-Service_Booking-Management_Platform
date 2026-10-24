@@ -55,6 +55,8 @@ dependencies {
     implementation 'io.github.cdimascio:dotenv-java:3.2.0'
 
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+    implementation 'io.github.cdimascio:dotenv-java:3.0.0'
 }
 
 tasks.named('test') {
