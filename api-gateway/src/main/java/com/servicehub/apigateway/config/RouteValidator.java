@@ -1,18 +1,18 @@
-package com.servicehub.apigateway.filter;
+package com.servicehub.apigateway.config;
 
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.function.Predicate;
 
 @Component
 public class RouteValidator {
 
-    // In URLs ke liye token nahi chahiye (Public URLs)
+    // Define endpoints that do NOT require a token
     public static final List<String> openApiEndpoints = List.of(
             "/api/v1/auth/register",
-            "/api/v1/auth/login"
+            "/api/v1/auth/login",
+            "/eureka"
     );
 
     public Predicate<ServerHttpRequest> isSecured =

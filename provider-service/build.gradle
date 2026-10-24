@@ -1,0 +1,48 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.4'
+}
+
+group = 'com.servicehub'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '21'
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springCloudVersion', "2023.0.1")
+}
+
+dependencies {
+    // 1. Spring Boot BOM (Ye line add ki gayi hai versions resolve karne ke liye)
+    implementation platform('org.springframework.boot:spring-boot-dependencies:3.2.4')
+
+    // 2. Spring Cloud BOM
+    implementation platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+    // Yahan explicitly version 1.18.32 add kar diya hai
+    compileOnly 'org.projectlombok:lombok:1.18.32'
+    annotationProcessor 'org.projectlombok:lombok:1.18.32'
+
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+}
+
+
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

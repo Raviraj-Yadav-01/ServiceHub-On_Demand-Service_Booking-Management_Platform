@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +29,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserServiceClient userServiceClient;
+    private final RestClient restClient;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -47,10 +49,7 @@ public class AuthService {
         // 3. Save to database
         AuthUser savedUser = authUserRepository.save(user);
 
-        // ==========================================
-        // 4. INTER-SERVICE COMMUNICATION: User Profile creation
-        // User-service (port 8081) ko baaki ki details bhejna
-        // ==========================================
+
         UserProfileRequest profileRequest = UserProfileRequest.builder()
                 .authUserId(savedUser.getId())
                 .email(savedUser.getEmail())
@@ -59,7 +58,7 @@ public class AuthService {
                 .phoneNumber(request.getPhoneNumber())
                 .build();
 
-        // Yeh method background mein HTTP request bhejega user-service ko
+
         userServiceClient.createProfileInUserService(profileRequest);
 
         // 5. Generate JWT Token
@@ -75,7 +74,7 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        // 1. Authenticate user (This will automatically check password using PasswordEncoder)
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -101,9 +100,19 @@ public class AuthService {
 
     private String generateTokenWithExtraClaims(AuthUser user) {
         Map<String, Object> extraClaims = new HashMap<>();
-        extraClaims.put("userId", user.getId());  // Bahut zaruri: API gateway yahi se id nikalega
+        extraClaims.put("userId", user.getId());
         extraClaims.put("role", user.getRole().name());
 
         return jwtService.generateToken(extraClaims, user);
+    }
+
+    public String fetchUserDetails(String username) {
+
+        String response = restClient.get()
+                .uri("http://user-service/api/users/" + username)
+                .retrieve()
+                .body(String.class);
+
+        return response;
     }
 }

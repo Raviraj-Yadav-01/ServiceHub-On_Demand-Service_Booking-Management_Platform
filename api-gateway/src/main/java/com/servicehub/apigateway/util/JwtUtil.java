@@ -14,6 +14,7 @@ public class JwtUtil {
     // Same secret key jo auth-service mein thi
     public static final String SECRET = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
 
+
     public void validateToken(final String token) {
         Jwts.parser().verifyWith(getSignKey()).build().parseSignedClaims(token);
     }
