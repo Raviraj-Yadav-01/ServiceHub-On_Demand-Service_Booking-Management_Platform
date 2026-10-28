@@ -12,10 +12,7 @@ public class AuthServiceApplication {
 
     public static void main(String[] args) {
 
-        Dotenv.configure()
-                .ignoreIfMissing()
-                .systemProperties()
-                .load();
+        Dotenv.configure().ignoreIfMissing().systemProperties().load();
 
         SpringApplication.run(AuthServiceApplication.class, args);
     }
