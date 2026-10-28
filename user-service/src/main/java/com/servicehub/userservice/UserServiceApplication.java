@@ -14,10 +14,7 @@ public class UserServiceApplication {
 
     public static void main(String[] args) {
 
-        Dotenv.configure()
-                .ignoreIfMissing()
-                .systemProperties()
-                .load();
+        Dotenv.configure().ignoreIfMissing().systemProperties().load();
 
         SpringApplication.run(UserServiceApplication.class, args);
     }
