@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class UserProfileRequest {
-    private Long authUserId; // Yeh sabse zaruri hai dono ko link karne ke liye
+    private Long authUserId;
     private String email;
     private String firstName;
     private String lastName;

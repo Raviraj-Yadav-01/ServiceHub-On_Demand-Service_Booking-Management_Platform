@@ -5,7 +5,6 @@ plugins {
 
 group = 'com.servicehub'
 version = '0.0.1-SNAPSHOT'
-
 java {
 	sourceCompatibility = '21'
 }
@@ -38,5 +37,10 @@ dependencies {
 	// 5. Testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+	implementation 'io.github.cdimascio:dotenv-java:3.2.0'
+
+	// Nayi Actuator Dependency (Monitoring ke liye
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 }

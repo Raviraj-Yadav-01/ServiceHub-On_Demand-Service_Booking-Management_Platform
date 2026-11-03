@@ -8,7 +8,6 @@ import com.servicehub.bookingservice.mappers.BookingMapper;
 import com.servicehub.bookingservice.service.BookingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,9 +30,7 @@ public class BookingController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<BookingResponseDto> updateBookingStatus(
-            @PathVariable Long id,
-            @RequestParam BookingStatus status) {
+    public ResponseEntity<BookingResponseDto> updateBookingStatus(@PathVariable Long id, @RequestParam BookingStatus status) {
         Booking updatedBooking = bookingService.updateBookingStatus(id, status);
         return ResponseEntity.ok(bookingMapper.toResponseDto(updatedBooking));
     }

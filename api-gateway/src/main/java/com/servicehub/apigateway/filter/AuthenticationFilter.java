@@ -69,8 +69,23 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     // Helper method for errors
     private Mono<Void> onError(ServerWebExchange exchange, String err, HttpStatus httpStatus) {
-        exchange.getResponse().setStatusCode(httpStatus);
-        return exchange.getResponse().setComplete();
+        org.springframework.http.server.reactive.ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(httpStatus);
+        response.getHeaders().setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
+
+        // JSON Error Payload banana
+        String errorJson = String.format(
+                "{\"timestamp\":\"%s\",\"status\":%d,\"error\":\"%s\",\"message\":\"%s\"}",
+                java.time.LocalDateTime.now(),
+                httpStatus.value(),
+                httpStatus.getReasonPhrase(),
+                err
+        );
+
+        org.springframework.core.io.buffer.DataBuffer buffer =
+                response.bufferFactory().wrap(errorJson.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+
+        return response.writeWith(reactor.core.publisher.Mono.just(buffer));
     }
 
     @Override
