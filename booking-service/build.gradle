@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.2.0'
+    id 'org.springframework.boot' version '3.2.3'
 }
 
 group = 'com.servicehub'
@@ -38,6 +38,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
+    implementation 'io.github.cdimascio:dotenv-java:3.2.0'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

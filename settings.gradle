@@ -6,6 +6,12 @@ include 'user-service'
 
 include 'auth-service'
 
+include 'provider-service'
+
+include 'booking-service'
+
+include 'payment-service'
+
 include 'api-gateway'
 
 include 'discovery-server' //Eureka Server
