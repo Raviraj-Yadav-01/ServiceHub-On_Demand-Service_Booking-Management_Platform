@@ -5,8 +5,10 @@ import com.servicehub.paymentservice.dto.request.PaymentRequestDto;
 import com.servicehub.paymentservice.dto.response.BookingResponseDto;
 import com.servicehub.paymentservice.entity.Payment;
 import com.servicehub.paymentservice.entity.PaymentStatus;
+import com.servicehub.paymentservice.kafka.KafkaProducerService;
+import com.servicehub.paymentservice.kafka.PaymentEventDto;
 import com.servicehub.paymentservice.repository.PaymentRepository;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker; // <-- Naya Import
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,40 +22,38 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final BookingClient bookingClient;
+    private final KafkaProducerService kafkaProducerService;
 
     @Transactional
-    // NAYA LOGIC: Circuit Breaker add kiya
-    @CircuitBreaker(name = "bookingService", fallbackMethod = "processPaymentFallback")
+   // @CircuitBreaker(name = "bookingService", fallbackMethod = "processPaymentFallback")
     public Payment processPayment(PaymentRequestDto request) {
-        // 1. Check if payment already exists
+
         paymentRepository.findByBookingId(request.getBookingId()).ifPresent(p -> {
             throw new IllegalStateException("Payment already processed for booking ID: " + request.getBookingId());
         });
 
-        // 2. Fetch ALL Bookings for this customer
         List<BookingResponseDto> customerBookings = bookingClient.getBookingsByCustomerId(request.getCustomerId());
 
         if (customerBookings == null || customerBookings.isEmpty()) {
             throw new IllegalArgumentException("No bookings found for this customer.");
         }
 
-        // 3. Find the specific booking we are trying to pay for
         BookingResponseDto targetBooking = customerBookings.stream()
                 .filter(b -> b.getId().equals(request.getBookingId()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Booking ID " + request.getBookingId() + " does not belong to this customer or does not exist."));
 
-        // 4. Verify Amount
+
         if (targetBooking.getTotalAmount().compareTo(request.getAmount()) != 0) {
             throw new IllegalArgumentException("Amount mismatch! Expected: " + targetBooking.getTotalAmount() + ", but got: " + request.getAmount());
         }
 
-        // 5. Check if booking is in a valid state
-        if ("COMPLETED".equals(targetBooking.getStatus()) || "CANCELLED".equals(targetBooking.getStatus())) {
+
+        if ("CONFIRMED".equals(targetBooking.getStatus()) || "CANCELLED".equals(targetBooking.getStatus())) {
             throw new IllegalStateException("Payment cannot be processed for " + targetBooking.getStatus() + " bookings.");
         }
 
-        // 6. Process Payment
+
         Payment payment = new Payment();
         payment.setBookingId(request.getBookingId());
         payment.setCustomerId(request.getCustomerId());
@@ -64,9 +64,21 @@ public class PaymentService {
 
         Payment savedPayment = paymentRepository.save(payment);
 
-        // 7. Booking Service ko inform karein ki payment ho gaya hai
+        PaymentEventDto event = new PaymentEventDto(
+                savedPayment.getBookingId(),
+                savedPayment.getCustomerId(),
+                savedPayment.getAmount(),
+                savedPayment.getPaymentMethod(),
+                savedPayment.getTransactionId(),
+                savedPayment.getStatus().name()
+        );
+
+
+        kafkaProducerService.sendPaymentSuccessEvent(event);
+
+
         try {
-            bookingClient.updateBookingStatus(request.getBookingId(), "SUCCESS");
+            bookingClient.updateBookingStatus(request.getBookingId(), "CONFIRMED");
             System.out.println("Booking status update successfully!");
         } catch (Exception e) {
             throw new RuntimeException("Payment successful, but failed to update Booking status. Error: " + e.getMessage());

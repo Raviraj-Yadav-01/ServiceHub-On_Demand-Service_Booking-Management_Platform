@@ -45,8 +45,12 @@ dependencies {
 
     // Resilience4j Circuit Breaker
     implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+
     // AOP zaroori hai @CircuitBreaker annotation ke liye
     implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+    // kafka
+    implementation 'org.springframework.kafka:spring-kafka'
 }
 
 tasks.named('test') {

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 // name = "booking-service" wahi naam hona chahiye jo Eureka mein register hota hai
-@FeignClient(name = "booking-service")
+@FeignClient(name = "http://localhost:8084")
 public interface BookingClient {
 
     @GetMapping("/api/v1/bookings/customer/{id}")
@@ -15,6 +15,6 @@ public interface BookingClient {
 
 
     // NAYA METHOD: Booking status update karne ke liye
-    @PatchMapping("/api/v1/bookings/{id}/status")
+    @PutMapping("/api/v1/bookings/{id}/status")
     void updateBookingStatus(@PathVariable("id") Long id, @RequestParam("status") String status);
 }
