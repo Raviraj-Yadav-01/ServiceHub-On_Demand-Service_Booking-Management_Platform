@@ -19,7 +19,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookingController {
 
-
     private final BookingService bookingService;
     private final BookingMapper bookingMapper;
 
@@ -29,8 +28,9 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookingMapper.toResponseDto(savedBooking));
     }
 
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<BookingResponseDto> updateBookingStatus(@PathVariable Long id, @RequestParam BookingStatus status) {
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<BookingResponseDto> updateBookingStatus(@PathVariable Long id, @RequestParam("status") BookingStatus status) {
         Booking updatedBooking = bookingService.updateBookingStatus(id, status);
         return ResponseEntity.ok(bookingMapper.toResponseDto(updatedBooking));
     }
@@ -44,6 +44,7 @@ public class BookingController {
                 .toList();
         return ResponseEntity.ok(responseDtos);
     }
+
 
     @GetMapping("/provider/{providerId}")
     public ResponseEntity<List<BookingResponseDto>> getBookingsByProvider(@PathVariable Long providerId) {

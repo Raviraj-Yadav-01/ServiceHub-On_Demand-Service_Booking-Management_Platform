@@ -12,6 +12,8 @@ include 'booking-service'
 
 include 'payment-service'
 
-include 'api-gateway'
+include 'notification-service'
 
-include 'discovery-server' //Eureka Server
+include 'discovery-server'
+
+include 'api-gateway'
